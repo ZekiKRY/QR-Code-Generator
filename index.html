@@ -77,6 +77,25 @@
             display: flex;
             justify-content: center;
         }
+
+        .AnaMenu {
+    position: fixed; /* Sayfaya sabitlenmez, içeriğe göre konumlanır */
+    bottom: 10px; /* Alt kenardan 10px yukarı */
+    left: 10px; /* Sol kenardan 10px sağa */
+    background-color: #1e561b; 
+    color: rgb(255, 255, 255); 
+    font-size: 15px; 
+    font-weight: bold; 
+    padding: 8px 12px; 
+    border-radius: 5px; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+    z-index: 1000; 
+    text-align: center; 
+    cursor: pointer;
+
+    text-decoration: none; /* Alt çizgiyi kaldırır */
+    display: inline-block; /* Padding ve boyutların doğru çalışmasını sağlar */
+}
     </style>
 </head>
 <body>
@@ -84,7 +103,7 @@
 <div class="container">
     <h2>QR Kart Oluştur</h2>
     
-    <input type="text" id="title-input" placeholder="Başlık (Örn: Kardiyoloji Sempozyumu)" />
+    <input type="text" id="title-input" placeholder="Başlık (Örn: Kardiyoloji)" />
     <input type="text" id="link-input" placeholder="URL veya Metin" />
     
     <button class="btn btn-generate" onclick="handleProcess()">Kartı Oluştur</button>
@@ -98,7 +117,9 @@
 
     <button id="downloadBtn" class="btn btn-download" onclick="downloadCard()">PNG Kartı İndir</button>
 </div>
-
+ <div>
+    <a class="AnaMenu" href="https://zekikry.github.io/Hesaplama_Sitesi/">Ana Sayfaya Dön</a>
+ </div>
 <script>
     const qrContainer = document.getElementById("qrcode");
     const titleInput = document.getElementById("title-input");
@@ -181,8 +202,8 @@
 
         // 5. Alt Bilgi (Opsiyonel)
         ctx.fillStyle = "#94a3b8";
-        ctx.font = "20px sans-serif";
-        ctx.fillText("SCAN ME!", cardWidth / 2, cardHeight - 30);
+        ctx.font = "12px sans-serif";
+        ctx.fillText("EÜTF Yön Bulma Sistemi | ZEKI", cardWidth / 2, cardHeight - 30);
 
         // 6. İndirme İşlemi
         const imageURL = canvas.toDataURL("image/png");
@@ -199,5 +220,4 @@
 </script>
 
 </body>
-
 </html>
