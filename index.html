@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Coder Free</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --success: #16a34a;
+            --bg: #363636;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: rgb(197, 222, 174);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            width: 380px;
+            text-align: center;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+            transition: 0.3s;
+        }
+        .btn-generate { background: var(--primary); color: white; }
+        .btn-download { background: #334155; color: white; display: none; }
+        
+        #status-message {
+            margin: 10px 0;
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 14px;
+            display: none;
+        }
+        .msg-green { background: #dcfce7; color: #166534; display: block; }
+
+        /* Kart Önizleme Alanı */
+        #preview-card {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #ffffff;
+        }
+        #title-preview {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #1e293b;
+            word-wrap: break-word;
+        }
+        #qrcode {
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>QR Kart Oluştur</h2>
+    
+    <input type="text" id="title-input" placeholder="Başlık (Örn: Kardiyoloji)" />
+    <input type="text" id="link-input" placeholder="URL veya Metin" />
+    
+    <button class="btn btn-generate" onclick="handleProcess()">Kartı Oluştur</button>
+    
+    <div id="status-message"></div>
+
+    <div id="preview-card">
+        <div id="title-preview"></div>
+        <div id="qrcode"></div>
+    </div>
+
+    <button id="downloadBtn" class="btn btn-download" onclick="downloadCard()">PNG Kartı İndir</button>
+</div>
+
+<script>
+    const qrContainer = document.getElementById("qrcode");
+    const titleInput = document.getElementById("title-input");
+    const linkInput = document.getElementById("link-input");
+    const titlePreview = document.getElementById("title-preview");
+    const statusMsg = document.getElementById("status-message");
+    const downloadBtn = document.getElementById("downloadBtn");
+
+    let lastCombination = ""; // Başlık + Link takibi için
+    let qrcodeObj = null;
+
+    function handleProcess() {
+        const title = titleInput.value.trim();
+        const link = linkInput.value.trim();
+        const currentCombination = title + "|||" + link;
+
+        if (!link) {
+            alert("En azından bir link girmelisiniz!");
+            return;
+        }
+
+        if (currentCombination === lastCombination) {
+            showStatus("Zaten oluşturuldu", "green");
+        } else {
+            generateCard(title, link);
+            showStatus("Oluşturuldu", "green");
+            lastCombination = currentCombination;
+            downloadBtn.style.display = "block";
+        }
+    }
+
+    function generateCard(title, link) {
+        titlePreview.innerText = title;
+        qrContainer.innerHTML = ""; // Eski QR'ı sil
+        
+        qrcodeObj = new QRCode(qrContainer, {
+            text: link,
+            width: 200,
+            height: 200,
+            correctLevel: QRCode.CorrectLevel.H
+        });
+    }
+
+    function downloadCard() {
+        // Görünmez bir canvas oluşturalım (Görüntü İşleme Alanı)
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        const qrCanvas = qrContainer.querySelector("canvas");
+
+        // Kart boyutlarını belirle
+        const padding = 40;
+        const cardWidth = 300;
+        const cardHeight = 400;
+
+        canvas.width = cardWidth;
+        canvas.height = cardHeight;
+
+        // 1. Arka Planı Çiz (Beyaz Kart)
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, cardWidth, cardHeight);
+        
+        // 2. Kenarlık Çiz
+        ctx.strokeStyle = "#e2e8f0";
+        ctx.lineWidth = 4;
+        ctx.strokeRect(5, 5, cardWidth - 10, cardHeight - 10);
+
+        // 3. Başlığı Yaz
+        ctx.fillStyle = "#1e293b";
+        ctx.font = "bold 24px sans-serif";
+        ctx.textAlign = "center";
+        // Metin uzunsa kaydırmayı basit tutalım
+        ctx.fillText(titleInput.value, cardWidth / 2, 60);
+
+        // 4. QR Kodu Çiz (Merkezleyerek)
+        // qrCanvas'tan görüntüyü alıp bizim ana canvas'ımıza kopyalıyoruz
+        const qrSize = 220;
+        const xPos = (cardWidth - qrSize) / 2;
+        const yPos = 100;
+        ctx.drawImage(qrCanvas, xPos, yPos, qrSize, qrSize);
+
+        // 5. Alt Bilgi (Opsiyonel)
+        ctx.fillStyle = "#94a3b8";
+        ctx.font = "12px sans-serif";
+        ctx.fillText("EÜTF Yön Bulma Sistemi | ZEKI", cardWidth / 2, cardHeight - 30);
+
+        // 6. İndirme İşlemi
+        const imageURL = canvas.toDataURL("image/png");
+        const link = document.createElement("a");
+        link.href = imageURL;
+        link.download = `${titleInput.value || 'qr-kod'}.png`;
+        link.click();
+    }
+
+    function showStatus(text, type) {
+        statusMsg.innerText = text;
+        statusMsg.className = type === "green" ? "msg-green" : "";
+    }
+</script>
+
+</body>
+</html>
