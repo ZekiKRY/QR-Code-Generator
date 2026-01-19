@@ -84,7 +84,7 @@
 <div class="container">
     <h2>QR Kart Oluştur</h2>
     
-    <input type="text" id="title-input" placeholder="Başlık (Örn: Kardiyoloji)" />
+    <input type="text" id="title-input" placeholder="Başlık (Örn: Kardiyoloji Sempozyumu)" />
     <input type="text" id="link-input" placeholder="URL veya Metin" />
     
     <button class="btn btn-generate" onclick="handleProcess()">Kartı Oluştur</button>
@@ -181,8 +181,8 @@
 
         // 5. Alt Bilgi (Opsiyonel)
         ctx.fillStyle = "#94a3b8";
-        ctx.font = "12px sans-serif";
-        ctx.fillText("EÜTF Yön Bulma Sistemi | ZEKI", cardWidth / 2, cardHeight - 30);
+        ctx.font = "20px sans-serif";
+        ctx.fillText("SCAN ME!", cardWidth / 2, cardHeight - 30);
 
         // 6. İndirme İşlemi
         const imageURL = canvas.toDataURL("image/png");
@@ -199,4 +199,5 @@
 </script>
 
 </body>
+
 </html>
